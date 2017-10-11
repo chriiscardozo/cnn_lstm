@@ -1,0 +1,15 @@
+(https://www.tensorflow.org/install/install_linux#InstallingNativePip)
+
+Instalação do tensor flow no Ubuntu 16.04 sem suporte à GPU usando PIP:
+
+* sudo apt-get install python3-pip python3-dev
+* sudo pip3 install tensorflow
+
+Para ver se tudo funciona, rodar o seguinte código Python:
+
+	import tensorflow as tf
+	hello = tf.constant('Hello, TensorFlow!')
+	sess = tf.Session()
+	print(sess.run(hello))
+
+Se printar 'Hello, TensorFlow!', tá tudo ok!

@@ -1,0 +1,34 @@
+from keras.models import Sequential
+
+model = Sequential()
+
+# usar .add() para ir adicionando camadas
+
+model.add(Dense(units=64, input_dim=100))
+model.add(Activation('relu'))
+model.add(Dense(units=10))
+model.add(Activation('softmax'))
+
+# .compile() configura o processo de aprendizado
+#model.compile(	loss='categorical_crossentropy',
+#				optimizer='sgd',
+#				metrics=['accuracy']
+#			 )
+
+# podemos usar o .compile() com parâmetros configuráveis
+model.compile(	loss=keras.losses.categorical_crossentropy,
+				optimizer=keras.optimizer.SGD(lr=0.01, momentum=0.9, nesterov=True),
+				metrics=['accuracy']
+			 )
+
+# processo de treinamento em batches
+model.fit(x_train, y_train, epochs=5, batch_size=32)
+
+# Podemos fornecer os batchs de treinamento
+# model.train_on_batch(x_batch, y_batch)
+
+# Avaliação do modelo
+loss_metrics = model.evaluate(x_test, y_test, batch_size=128)
+
+# Para gerar predicoes em novos dados
+classes = model.predict(x_test, batch_size=128)

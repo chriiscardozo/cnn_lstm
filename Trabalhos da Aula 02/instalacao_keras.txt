@@ -1,0 +1,19 @@
+Instalação: sudo pip3 install keras
+
+Pacotes opcionais:
+- cuDNN (recommended if you plan on running Keras on GPU).
+- HDF5 and h5py (required if you plan on saving Keras models to disk).
+- graphviz and pydot (used by visualization utilities to plot model graphs).
+
+
+Por default o Keras vem habilitado para TensorFlow.
+Para mudar, editar o arquivo $HOME/.keras/keras.json:
+
+{
+    "image_data_format": "channels_last",
+    "epsilon": 1e-07,
+    "floatx": "float32",
+    "backend": "tensorflow"
+}
+
+=> Mudar backend para o desejado: "theano", "tensorflow" ou "cntk"

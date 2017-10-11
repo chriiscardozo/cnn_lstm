@@ -1,0 +1,117 @@
+Tarefas:
+
+* Aprender à usar o Keras
+* Como criar uma função customizada e parametrizável no TensorFlow (ou no Keras)
+* Extra: Como o otimizador ADAM funciona?
+
+
+
+
+**********************************************************************************************
+Keras:
+
+Keras is a high-level neural networks API, written in Python and capable of running on top of TensorFlow, CNTK, or Theano. Runs seamlessly on CPU and GPU.
+
+
+The core data structure of Keras is a model, a way to organize layers. The simplest type of model is the Sequential model, a linear stack of layers.
+
+
+=> Getting started with the Keras Sequential model
+
+The Sequential model is a linear stack of layers.
+
+BUILDING A MODEL
+
+'''
+A primeira camada (apenas a primeira) precisa saber sobre a forma do input.
+Maneiras de fazer isso:
+	1. Passar input_shape como uma tupla
+	2. Algumas 2D layers possuem o param input_dim.
+	   Algumas 3D layers possuem o param input_dim e input_length.
+
+Todas as layers do Keras tem os seguintes métodos em comum:
+	- get_weights(), retorna os pesos em forma de lista de np.array
+	- set_weights(weights) , onde weigths é uma lista de np.array (deve ter o mesmo shape de output de get_weights())
+	- get_config(), retorna um dict com as configs da layer
+
+Dense Layer
+	1st param: output dim (qtd de neuronios na camada)
+
+keras.layers.core.Dense(units,
+						activation=None,
+						use_bias=True,
+						kernel_initializer='glorot_uniform', # init dos pesos
+						bias_initializer='zeros',
+						kernel_regularizer=None,
+						bias_regularizer=None,
+						activity_regularizer=None,
+						kernel_constraint=None,
+						bias_constraint=None)
+
+Activation Layers: diversas já implementadas como sigmoid, selu, relu, tanh, softmax
+	Funões de ativação avançadas em: keras.layers.advanced_activations
+		Ex: LeakyReLU, PReLU, etc
+
+Outras Layers (core): Dropout, Flatten, etc
+	Convulational: Conv1D,Conv2D, Conv3D, ZeroPadding1D, etc.
+	Pooling: MaxPooling1D, MaxPooling2D, ..., AveragePooling1D, etc.
+	Entre outros tipos de layers...
+''' 
+
+COMPILING THE MODEL
+
+=> configure learning process. Recebe 3 argumentos:
+	1. Otimizador: SGD, Adam, Adamax, etc.
+	2. Loss function: mean_squared_error, categorical_crossentropy, etc.
+	3. Lista de métricas: 'accuracy', 'categorical_accuracy', ou uma função custom:
+		import keras.backend as K; def mean_pred(y_true, y_pred): return K.mean(y_pred)
+
+TRAINING MODEL
+
+Usar fit para treinar:
+
+	fit(self, x, y, batch_size=32, epochs=10, verbose=1, callbacks=None, validation_split=0.0, validation_data=None, shuffle=True, class_weight=None, sample_weight=None, initial_epoch=0)
+
+		batch_size: numero de samples por atualizacao de gradiente
+		validation_split: 0. < x < 1
+		validation_data: sobreescreve o validation_split. Formato tuple (x_val, y_val) 
+
+=> exemplo binary training:
+# For a single-input model with 2 classes (binary classification):
+
+model = Sequential()
+model.add(Dense(32, activation='relu', input_dim=100))
+model.add(Dense(1, activation='sigmoid'))
+model.compile(optimizer='rmsprop',
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+
+# Generate dummy data
+import numpy as np
+data = np.random.random((1000, 100))
+labels = np.random.randint(2, size=(1000, 1))
+
+# Train the model, iterating on the data in batches of 32 samples
+model.fit(data, labels, epochs=10, batch_size=32)
+
+=> exemplo categorical training com 10 classes:
+# For a single-input model with 10 classes (categorical classification):
+
+model = Sequential()
+model.add(Dense(32, activation='relu', input_dim=100))
+model.add(Dense(10, activation='softmax'))
+model.compile(optimizer='rmsprop',
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+
+# Generate dummy data
+import numpy as np
+data = np.random.random((1000, 100))
+labels = np.random.randint(10, size=(1000, 1))
+
+# Convert labels to categorical one-hot encoding
+one_hot_labels = keras.utils.to_categorical(labels, num_classes=10)
+
+# Train the model, iterating on the data in batches of 32 samples
+model.fit(data, one_hot_labels, epochs=10, batch_size=32)
+

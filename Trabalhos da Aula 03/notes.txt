@@ -1,0 +1,57 @@
+Funções de ativação customizadas e parametrizadas no Tensorflow:
+
+https://stackoverflow.com/questions/39921607/how-to-make-a-custom-activation-function-with-only-python-in-tensorflow
+https://en.wikipedia.org/wiki/Activation_function
+
+
+Passos para criar uma função de ativação no TF usando apenas python:
+
+1) definir função
+2) definir derivada da função
+3) transformar funções em np funções com o vectorize
+4) transformar np funções para versoes de float32
+5) transformar a função np derivada float32 para função tf usando tf.py_func
+6) definir um hack da py_func que registra o gradiente ao criar a função
+7) criar função em python que calcula o gradiente
+8) transformar a função np float32 para função tf usando o py_func hacked
+9) Uso:
+	with tf.Session() as sess:
+	    x = tf.constant([0.2,0.7,1.2,1.7])
+	    y = tf_funcao_ativacao(x)
+	    tf.global_variables_initializer().run()
+	    print(x.eval(), y.eval(), tf.gradients(y, [x])[0].eval())
+
+********************************************************************************
+
+LSTM:
+
+para entender: http://colah.github.io/posts/2015-08-Understanding-LSTMs/
+exemplos no keras: https://keras.io/getting-started/sequential-model-guide/#examples
+exemplos no keras[2]: https://raw.githubusercontent.com/fchollet/keras/master/examples
+
+keras.layers.recurrent.LSTM(units,
+							activation='tanh', 
+							recurrent_activation='hard_sigmoid', 
+							use_bias=True, 
+							kernel_initializer='glorot_uniform', recurrent_initializer='orthogonal', bias_initializer='zeros', 
+							unit_forget_bias=True, 
+							kernel_regularizer=None, recurrent_regularizer=None, 
+							bias_regularizer=None, 
+							activity_regularizer=None, 
+							kernel_constraint=None, 
+							recurrent_constraint=None, 
+							bias_constraint=None, 
+							dropout=0.0, 
+							recurrent_dropout=0.0, 
+							implementation=1, 
+							return_sequences=False, 
+							return_state=False, 
+							go_backwards=False, 
+							stateful=False, 
+							unroll=False)
+
+exemplos no tensorflow: 
+	https://www.tensorflow.org/tutorials/recurrent#lstm
+	https://github.com/aymericdamien/TensorFlow-Examples
+
+********************************************************************************
