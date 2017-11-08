@@ -138,7 +138,7 @@ def plotGeneratedImages(e, generator, output_dir, examples=100, dim=(10, 10), fi
 def main():
 	if(len(sys.argv) > 1):
 		folder = 'output_'+sys.argv[1]
-		if os.path.exists(directory):
+		if os.path.exists(folder):
 			shutil.rmtree(folder)
 		os.makedirs(folder)
 
