@@ -1,3 +1,5 @@
+# original reference: https://github.com/Zackory/Keras-MNIST-GAN
+
 import sys
 import os
 import shutil
