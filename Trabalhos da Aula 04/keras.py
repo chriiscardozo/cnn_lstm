@@ -1,0 +1,1 @@
+# não encontrei formas de definir uma função no tensorflow e usar no keras
