@@ -28,6 +28,10 @@ def bias_variable(shape):
 	initial = tf.constant(0.1, shape=shape)
 	return tf.Variable(initial)
 
+def alpha_variable(shape):
+	initial = tf.constant(0.01, shape=shape)
+	return tf.Variable(initial)
+
 def conv2d(x, W):
 	# padding = SAME mantem dimensoes da img
 	return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
@@ -39,9 +43,7 @@ def max_pool_2x2(x):
 # segundo e terceira dimensoes sao W e H do input e a quarta é a qtd de canais
 x_image = tf.reshape(x, [-1, 28, 28, 1])
 
-alpha1 = tf.Variable([0.], tf.float32)
-alpha2 = tf.Variable([-.5], tf.float32)
-alpha3 = tf.Variable([1.8], tf.float32)
+alpha1 = alpha_variable([1, 28, 28, 32])
 
 # *** Primeira layer ***
 # Filtro 5 x 5; 1 canal na entrada; 32 canais de saída (filtros)
@@ -55,7 +57,7 @@ h_pool1 = max_pool_2x2(h_conv1)
 W_conv2 = weight_variable([5, 5, 32, 64])
 b_conv2 = bias_variable([64])
 
-h_conv2 = tf_prelu(alpha2, conv2d(h_pool1, W_conv2) + b_conv2)
+h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
 h_pool2 = max_pool_2x2(h_conv2)
 
 
@@ -64,7 +66,7 @@ W_fc1 = weight_variable([7 * 7 * 64, 1024])
 b_fc1 = bias_variable([1024])
 
 h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
-h_fc1 = tf_prelu(alpha3, tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
+h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
 # *** Dropout layer ***
 # Essa camada busca reduzir os casos de overfitting
@@ -93,9 +95,7 @@ with tf.Session() as sess:
 					x: batch[0], y_: batch[1], keep_prob: 1.0})
 			print('step %d, training accuracy %g' % (i, train_accuracy))
 			v1 = sess.run(alpha1)
-			v2 = sess.run(alpha2)
-			v3 = sess.run(alpha3)
-			print(v1, v2, v3)
+			print(v1)
 		train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
 
 	print('test accuracy %g' % accuracy.eval(feed_dict={
