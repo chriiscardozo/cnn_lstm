@@ -138,7 +138,8 @@ def plotGeneratedImages(e, generator, output_dir, examples=100, dim=(10, 10), fi
 def main():
 	if(len(sys.argv) > 1):
 		folder = 'output_'+sys.argv[1]
-		shutil.rmtree(folder)
+		if os.path.exists(directory):
+			shutil.rmtree(folder)
 		os.makedirs(folder)
 
 	(X_train, y_train), (X_test, y_test) = mnist.load_data()
