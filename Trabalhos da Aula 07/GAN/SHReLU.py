@@ -6,7 +6,7 @@ from keras.engine import InputSpec
 
 class SHReLU(Layer):
 
-	def __init__(self, alpha_initializer='zeros', shared_axes=None, **kwargs):
+	def __init__(self, alpha_initializer=initializers.Constant(value=0.1), shared_axes=None, **kwargs):
 		super(SHReLU, self).__init__(**kwargs)
 
 		self.alpha_initializer = initializers.get(alpha_initializer)

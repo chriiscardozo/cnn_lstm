@@ -10,6 +10,7 @@ from keras.layers import Reshape, Dense, Dropout, Flatten, Conv2D, LeakyReLU, Ac
 import matplotlib.pyplot as plt
 import time
 from SHReLU import SHReLU
+from keras.initializers import Constant
 
 np.random.seed(42)
 
@@ -23,13 +24,13 @@ def generator_model(opt):
 	model = Sequential()
 	model.add(Dense(256, input_dim=100, kernel_initializer=RandomNormal(stddev=0.02)))
 	# model.add(LeakyReLU(0.2))
-	model.add(SHReLU())
+	model.add(SHReLU(alpha_initializer=Constant(value=0.2)))
 	model.add(Dense(512))
 	# model.add(LeakyReLU(0.2))
-	model.add(SHReLU())
+	model.add(SHReLU(alpha_initializer=Constant(value=0.2)))
 	model.add(Dense(1024))
 	# model.add(LeakyReLU(0.2))
-	model.add(SHReLU())
+	model.add(SHReLU(alpha_initializer=Constant(value=0.2)))
 	model.add(Dense(784))
 	model.add(Activation('tanh'))
 
@@ -42,15 +43,15 @@ def discriminator_model(opt):
 
 	model.add(Dense(1024, input_dim=784, kernel_initializer=RandomNormal(stddev=0.02)))
 	# model.add(LeakyReLU(0.2))
-	model.add(SHReLU())
+	model.add(SHReLU(alpha_initializer=Constant(value=0.2)))
 	model.add(Dropout(0.3))
 	model.add(Dense(512))
 	# model.add(LeakyReLU(0.2))
-	model.add(SHReLU())
+	model.add(SHReLU(alpha_initializer=Constant(value=0.2)))
 	model.add(Dropout(0.3))
 	model.add(Dense(256))
 	# model.add(LeakyReLU(0.2))
-	model.add(SHReLU())
+	model.add(SHReLU(alpha_initializer=Constant(value=0.2)))
 	model.add(Dropout(0.3))
 	model.add(Dense(1, activation='sigmoid'))
 	model.compile(loss='binary_crossentropy', optimizer=opt)
