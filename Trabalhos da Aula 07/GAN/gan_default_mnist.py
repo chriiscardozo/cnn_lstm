@@ -60,7 +60,7 @@ def gan_model(D, G, opt):
 
 	return gan
 
-def train(X_train, generator, discriminator, GAN, epochs=6000, verbose_step=250, batch_size=128, output_dir='output'):
+def train(X_train, generator, discriminator, GAN, epochs=23000, verbose_step=250, batch_size=128, output_dir='output'):
 	print("*** Training", epochs, "epochs with batch size =", batch_size, "***")
 	times = []
 	d_lossses = []
