@@ -7,8 +7,8 @@ from keras.engine import InputSpec
 class BHSA(Layer):
 
 	def __init__(self,
-		lambda_initializer=initializers.Constant(value=0.5),
-		t_initializer=initializers.Constant(value=0.5),
+		lambda_initializer=initializers.Constant(value=1),
+		t_initializer=initializers.glorot_normal(),
 		shared_axes=None, **kwargs):
 		super(BHSA, self).__init__(**kwargs)
 
@@ -49,6 +49,6 @@ class BHSA(Layer):
 		# bhsa(l, t) = h1 - h2
 		# h1 = sqrt(( (l^2)*((x + (1/(2*l)))^2) ) + t^2)
 		# h2 = sqrt(( (l^2)*((x + (1/(2*l)))^2) ) + t^2)
-		h1 = K.sqrt( (K.square(self.l)*K.square(inputs + (1.0/(2*self.l)))) + K.square(self.t) )
-		h2 = K.sqrt( (K.square(self.l)*K.square(inputs - (1.0/(2*self.l)))) + K.square(self.t) )
-		return h1 - h2
+		h1 = K.sqrt( (K.square(self.l)*K.square(inputs + (1.0/(4*self.l)))) + K.square(self.t) )
+		h2 = K.sqrt( (K.square(self.l)*K.square(inputs - (1.0/(4*self.l)))) + K.square(self.t) )
+		return (h1 - h2) + 0.5
