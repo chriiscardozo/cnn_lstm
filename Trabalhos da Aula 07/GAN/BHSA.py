@@ -46,7 +46,7 @@ class BHSA(Layer):
 
 	def call(self, inputs):
 		# bi-hiperbolic simetric adaptative
-		# bhaa(l, t) = h1 - h2
+		# bhsa(l, t) = h1 - h2
 		# h1 = sqrt(( (l^2)*((x + (1/(2*l)))^2) ) + t^2)
 		# h2 = sqrt(( (l^2)*((x + (1/(2*l)))^2) ) + t^2)
 		h1 = K.sqrt( (K.square(self.l)*K.square(inputs + (1.0/(2*self.l)))) + K.square(self.t) )
