@@ -106,7 +106,10 @@ def train(X_train, y_train, generator, discriminator, GAN, epochs=23000, verbose
 
 		if(e % verbose_step == 0):
 			print(str(e) + ": d_loss =", d_loss, "| g_loss =", g_loss)
-			plotGeneratedImages(e, generator, output_dir)
+			
+			for num in range(0,10):
+				vec = encoder.fit_transform([num]).toarray()[0]
+				plotGeneratedImages(e, generator, output_dir, vec)
 
 	exec_time(start_train, "Training")
 	generate_graphics(times, d_lossses, g_losses, output_dir)
@@ -132,8 +135,8 @@ def generate_graphics(times, d_lossses, g_losses, output_dir):
 	plt.savefig(os.path.join(output_dir, 'losses.png'))
 	# plt.show()
 
-def plotGeneratedImages(e, generator, output_dir, examples=100, dim=(10, 10), figsize=(10, 10)):
-    noise = np.concatenate([np.random.normal(0, 1, size=[examples, 100]), [[0,0,0,0,0,1,0,0,0,0]]*examples ], axis=1)
+def plotGeneratedImages(e, generator, output_dir, one_hot_vec, examples=100, dim=(10, 10), figsize=(10, 10)):
+    noise = np.concatenate([np.random.normal(0, 1, size=[examples, 100]), [one_hot_vec]*examples ], axis=1)
 
     generatedImages = generator.predict(noise)
     generatedImages = generatedImages.reshape(examples, 28, 28)
@@ -146,7 +149,7 @@ def plotGeneratedImages(e, generator, output_dir, examples=100, dim=(10, 10), fi
         plt.imshow(generatedImages[i], interpolation='nearest', cmap='gray_r')
         plt.axis('off')
     plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, str(e) + '.png'))
+    plt.savefig(os.path.join(output_dir, str(e) + '_num' + str(np.where(one_hot_vec == 1)) + '.png'))
 
 def main():
 	if(len(sys.argv) > 1):
