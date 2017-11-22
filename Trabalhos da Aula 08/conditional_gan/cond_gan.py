@@ -108,7 +108,7 @@ def train(X_train, y_train, generator, discriminator, GAN, epochs=23000, verbose
 			print(str(e) + ": d_loss =", d_loss, "| g_loss =", g_loss)
 			
 			for num in range(0,10):
-				vec = encoder.fit_transform([num]).toarray()[0]
+				vec = encoder.fit_transform([[num]]).toarray()[0]
 				plotGeneratedImages(e, generator, output_dir, vec)
 
 	exec_time(start_train, "Training")
