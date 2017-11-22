@@ -135,7 +135,7 @@ def generate_graphics(times, d_lossses, g_losses, output_dir):
 	plt.savefig(os.path.join(output_dir, 'losses.png'))
 	# plt.show()
 
-def plotGeneratedImages(e, generator, output_dir, one_hot_vec, examples=100, dim=(10, 10), figsize=(10, 10)):
+def plotGeneratedImages(e, generator, output_dir, one_hot_vec, examples=25, dim=(5, 5), figsize=(10, 10)):
     noise = np.concatenate([np.random.normal(0, 1, size=[examples, 100]), [one_hot_vec]*examples ], axis=1)
 
     generatedImages = generator.predict(noise)
@@ -149,7 +149,7 @@ def plotGeneratedImages(e, generator, output_dir, one_hot_vec, examples=100, dim
         plt.imshow(generatedImages[i], interpolation='nearest', cmap='gray_r')
         plt.axis('off')
     plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, str(e) + '_num' + str(np.where(one_hot_vec == 1)) + '.png'))
+    plt.savefig(os.path.join(output_dir, str(e) + '_num' + str(np.where(one_hot_vec == 1)[0]) + '.png'))
 
 def main():
 	if(len(sys.argv) > 1):
