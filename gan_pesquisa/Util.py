@@ -2,6 +2,7 @@ import numpy as np
 from keras.datasets import mnist
 import matplotlib.pyplot as plt
 import os, shutil
+import time
 
 def convert_to_one_hot_vector(y, n_classes):
 	targets = np.array(y).reshape(-1)
@@ -48,7 +49,7 @@ def generate_graphics(times, d_lossses, g_losses, output_dir):
 	plt.savefig(os.path.join(output_dir, 'losses.png'))
 	# plt.show()
 
-def plot_generated_images(e, generatedImages, output_dir, dim=(5, 5), figsize=(10, 10)):
+def plot_generated_images(e, generatedImages, output_dir, dim=(5, 5), figsize=(5, 5)):
 	plt.close('all')
 
 	plt.figure(figsize=figsize)
@@ -63,3 +64,9 @@ def reset_dir(folder):
 	if os.path.exists(folder):
 		shutil.rmtree(folder)
 	os.makedirs(folder)
+
+def exec_time(start, msg):
+	end = time.time()
+	delta = end - start
+	if(delta > 60): print("Tempo: " + str(delta/60.0) + " min [" + msg + "]")
+	else: print("Tempo: " + str(int(delta)) + " s [" + msg + "]")
