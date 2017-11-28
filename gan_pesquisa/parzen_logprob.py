@@ -3,6 +3,7 @@ import numpy as np
 import Util
 from sklearn.neighbors.kde import KernelDensity
 import matplotlib.pyplot as plt
+from sklearn.model_selection import GridSearchCV
 
 def find_csv_filenames(path_to_dir, prefix="samples_", suffix=".csv"):
     filenames = os.listdir(path_to_dir)
@@ -25,13 +26,19 @@ def save_results(folder, x, lls_avg, lls_std):
 	# plt.show()
 
 def log_proba(X_test, folder, file_name):
-	# TODO: cross-validation to bandwidth
 	with open(os.path.join(folder, file_name), 'r') as f:
 		reader = csv.reader(f, delimiter=',')
 		samples = []
 		for row in reader: samples.append(row)
 		samples = np.array(samples)
-		kde = KernelDensity(kernel='gaussian', bandwidth=0.2).fit(samples)
+
+		# Cross-validation to find best bandwidth
+		params = {'bandwidth': np.logspace(-1, 1, 20)}
+		grid = GridSearchCV(KernelDensity(kernel='gaussian'), params)
+		grid.fit(samples)
+		print("best bandwidth: {0}".format(grid.best_estimator_.bandwidth))
+		kde = grid.best_estimator_
+		
 		scores = kde.score_samples(X_test)
 		return [np.mean(scores), np.std(scores)] # return mean log prob and std log prob
 
