@@ -26,7 +26,6 @@ def save_results(folder, x, lls_avg, lls_std):
 
 def log_proba(X_test, folder, file_name):
 	# TODO: cross-validation to bandwidth
-
 	with open(os.path.join(folder, file_name), 'r') as f:
 		reader = csv.reader(f, delimiter=',')
 		samples = []
@@ -34,7 +33,7 @@ def log_proba(X_test, folder, file_name):
 		samples = np.array(samples)
 		kde = KernelDensity(kernel='gaussian', bandwidth=0.2).fit(samples)
 		scores = kde.score_samples(X_test)
-		return [np.mean(scores), np.std(scores) # return mean log prob and std log prob
+		return [np.mean(scores), np.std(scores)] # return mean log prob and std log prob
 
 def main():
 	if(len(sys.argv) < 2):
