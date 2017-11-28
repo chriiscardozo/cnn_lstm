@@ -4,12 +4,15 @@ from keras.initializers import RandomNormal
 from keras.layers import Input, Dense, LeakyReLU, Activation, Dropout
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
+from keras.callbacks import TensorBoard
+from keras import backend as K
 import Util
 import numpy as np
 import time
+from Parzen import ParsenDensityEstimator as Parzen
 
 class GAN:
-	def __init__(self, optimizer=None, generator=None, discriminator=None):
+	def __init__(self, sess, optimizer=None, generator=None, discriminator=None):
 		if(optimizer is None): optimizer = Adam(lr=0.0002, beta_1=0.5)
 		if(generator is None): generator = Generator(optimizer)
 		if(discriminator is None): discriminator = Discriminator(optimizer)
@@ -19,28 +22,35 @@ class GAN:
 		self._optimizer = optimizer
 		self._model = self._create_gan_model()
 
-	def _create_gan_model(self):
-		self._discriminator.set_trainable(False)
-		
-		D = self._discriminator.get_model()
-		G = self._generator.get_model()
+		self._tensorboard = TensorBoard(log_dir='./logs/default', histogram_freq=1, write_graph=True, write_images=True)
+		self._tensorboard.set_model(self._model)
 
-		gan_input_shape = (self._generator.get_noise_dim(),)
-		gan_input = Input(shape=gan_input_shape)
-		gan_output = D(G(gan_input))
-		model = Model(gan_input, gan_output)
-		
-		model.compile(loss='binary_crossentropy', optimizer=self._optimizer)
+		self._session = sess
+
+	def _create_gan_model(self):
+		with K.name_scope('GAN'):
+			self._discriminator.set_trainable(False)
+			
+			D = self._discriminator.get_model()
+			G = self._generator.get_model()
+
+			gan_input_shape = (self._generator.get_noise_dim(),)
+			gan_input = Input(shape=gan_input_shape)
+			gan_output = D(G(gan_input))
+			model = Model(gan_input, gan_output)
+			
+			model.compile(loss='binary_crossentropy', optimizer=self._optimizer)
 
 		return model
 
-	def train(self, X_train, epochs=23000, batch_size=128, verbose_step=250, output_dir='output'):
+	def train(self, X_train, X_test, epochs=50000, batch_size=128, verbose_step=250, output_dir='output'):
 		print("*** Training", epochs, "epochs with batch size =", batch_size, "***")
 
 		times = []
 		d_losses = []
 		g_losses = []
-		ll = [] # TODO: log-likelihood tracking
+		d_accuracies = []
+		lls = [] # TODO: log-likelihood tracking
 
 		start = time.time()
 
@@ -57,7 +67,7 @@ class GAN:
 			y = np.zeros(2*batch_size)
 			y[:batch_size] = 0.9
 			self._discriminator.set_trainable(True)
-			d_loss = D_net.train_on_batch(X, y)
+			d_loss, d_accuracy = D_net.train_on_batch(X, y)
 
 			# GAN/Generator train
 			noise = self._generator.generate_noise(batch_size)
@@ -67,14 +77,30 @@ class GAN:
 
 			if(e % verbose_step == 0):
 				running_time = time.time() - start
+				start = time.time()
+				
 				d_losses.append(d_loss)
+				d_accuracies.append(d_accuracy)
 				g_losses.append(g_loss)
 				times.append(running_time)
-				start = time.time()
-				print(str(e) + ": d_loss =", d_loss, "| g_loss =", g_loss, "| time =", running_time)
+				ll_mean = self._compute_log_likelihood(X_test)
+				lls.append(ll_mean)
+
+				print(str(e) + ": d_loss =", d_loss, "| g_loss =", g_loss, "| time =", running_time, "| ll =", ll_mean)
 				self._plot_images(e, G_net, output_dir)
+
+				Util.write_tensorboard_log(self._tensorboard, 
+											['d_loss', 'g_loss', 'd_accuracy', 'mean_ll'], 
+											[d_loss, g_loss, d_accuracy, ll_mean], e)
 				
 		Util.generate_graphics(times, d_losses, g_losses, output_dir)
+
+	def _compute_log_likelihood(self, X_test, batch_size=100):
+		noise = self._generator.generate_noise(10000)
+		generated_images = self._generator.get_model().predict(noise)
+		p = Parzen()
+		result = p.get_ll(X_test, generated_images, 0.5, self._session)
+		return result
 
 	def _plot_images(self, e, G_net, output_dir, examples=25):
 		noise = self._generator.generate_noise(examples)
@@ -91,18 +117,19 @@ class Generator:
 		self._model = self._create_generator()
 
 	def _create_generator(self):
-		model = Sequential()
+		with K.name_scope('Generator'):
+			model = Sequential()
 
-		model.add(Dense(256, input_dim=self._noise_dim, kernel_initializer=RandomNormal(stddev=0.02)))
-		model.add(LeakyReLU(0.2))
-		model.add(Dense(512))
-		model.add(LeakyReLU(0.2))
-		model.add(Dense(1024))
-		model.add(LeakyReLU(0.2))
-		model.add(Dense(self._output_dim))
-		model.add(Activation('tanh'))
+			model.add(Dense(256, input_dim=self._noise_dim, kernel_initializer=RandomNormal(stddev=0.02)))
+			model.add(LeakyReLU(0.2))
+			model.add(Dense(512))
+			model.add(LeakyReLU(0.2))
+			model.add(Dense(1024))
+			model.add(LeakyReLU(0.2))
+			model.add(Dense(self._output_dim))
+			model.add(Activation('tanh'))
 
-		model.compile(loss='binary_crossentropy', optimizer=self._optimizer)
+			model.compile(loss='binary_crossentropy', optimizer=self._optimizer)
 
 		return model
 
@@ -123,21 +150,22 @@ class Discriminator:
 		self._model = self._create_discriminator()
 
 	def _create_discriminator(self):
-		model = Sequential()
+		with K.name_scope('Discriminator'):
+			model = Sequential()
 
-		model.add(Dense(1024, input_dim=self._input_dim, kernel_initializer=RandomNormal(stddev=0.02)))
-		model.add(LeakyReLU(0.2))
-		model.add(Dropout(0.3))
-		model.add(Dense(512))
-		model.add(LeakyReLU(0.2))
-		model.add(Dropout(0.3))
-		model.add(Dense(256))
-		model.add(LeakyReLU(0.2))
-		model.add(Dropout(0.3))
-		model.add(Dense(self._output_dim))
-		model.add(Activation('sigmoid'))
+			model.add(Dense(1024, input_dim=self._input_dim, kernel_initializer=RandomNormal(stddev=0.02)))
+			model.add(LeakyReLU(0.2))
+			model.add(Dropout(0.3))
+			model.add(Dense(512))
+			model.add(LeakyReLU(0.2))
+			model.add(Dropout(0.3))
+			model.add(Dense(256))
+			model.add(LeakyReLU(0.2))
+			model.add(Dropout(0.3))
+			model.add(Dense(self._output_dim))
+			model.add(Activation('sigmoid'))
 
-		model.compile(loss='binary_crossentropy', optimizer=self._optimizer)
+			model.compile(loss='binary_crossentropy', optimizer=self._optimizer, metrics=['accuracy'])
 
 		return model
 

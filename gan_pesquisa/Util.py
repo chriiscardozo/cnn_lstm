@@ -3,6 +3,7 @@ from keras.datasets import mnist
 import matplotlib.pyplot as plt
 import os, shutil
 import time
+import tensorflow as tf
 
 def convert_to_one_hot_vector(y, n_classes):
 	targets = np.array(y).reshape(-1)
@@ -70,3 +71,12 @@ def exec_time(start, msg):
 	delta = end - start
 	if(delta > 60): print("Tempo: " + str(delta/60.0) + " min [" + msg + "]")
 	else: print("Tempo: " + str(int(delta)) + " s [" + msg + "]")
+
+def write_tensorboard_log(callback, names, logs, batch_no):
+    for name, value in zip(names, logs):
+        summary = tf.Summary()
+        summary_value = summary.value.add()
+        summary_value.simple_value = value
+        summary_value.tag = name
+        callback.writer.add_summary(summary, batch_no)
+        callback.writer.flush()
