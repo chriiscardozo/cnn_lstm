@@ -59,14 +59,18 @@ def generate_graphics(times, d_lossses, g_losses, d_accuracies, output_dir):
 	plt.savefig(os.path.join(output_dir, 'losses.png'))
 	# plt.show()
 
-def save_generated_images(e, generatedImages, output_dir, dim=(5, 5), figsize=(5, 5)):
+def save_generated_images(e, generator, output_dir, dim=(5, 5), figsize=(5, 5), examples_img=25, examples_csv=1000):
+	noise = generator.generate_noise(examples_csv)
+	generatedImages = generator.get_model().predict(noise)
+
 	# saving as csv
-	with open(os.path.join(output_dir, str(e) + '.txt'), 'w') as f:
+	with open(os.path.join(output_dir, str(e) + '.csv'), 'w') as f:
 		writer = csv.writer(f, delimiter=',')
 		for x in generatedImages:
 			writer.writerow(x.tolist())
 
-	generatedImages = generatedImages.reshape(examples, 28, 28)
+	generatedImages = generatedImages[np.random.randint(0, generatedImages.shape[0], size=examples_img)]
+	generatedImages = generatedImages.reshape(examples_img, 28, 28)
 
 	# saving as img
 	plt.close('all')

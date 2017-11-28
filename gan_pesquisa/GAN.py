@@ -78,14 +78,9 @@ class GAN:
 				times.append(running_time)
 
 				print(str(e) + ": d_loss =", d_loss, "| g_loss =", g_loss, "| d_acc =", d_accuracy , "| time =", running_time)
-				self._save_images(e, G_net, output_dir)
+				Util.save_generated_images(e, self._generator, output_dir)
 
 		Util.generate_graphics(times, d_losses, g_losses, d_accuracies, output_dir)
-
-	def _save_images(self, e, G_net, output_dir, examples=25):
-		noise = self._generator.generate_noise(examples)
-		generatedImages = G_net.predict(noise)
-		Util.save_generated_images(e, generatedImages, output_dir)
 
 class Generator:
 	def __init__(self, optimizer, noise_dim=100, output_dim=784):

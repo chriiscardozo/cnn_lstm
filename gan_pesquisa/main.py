@@ -9,7 +9,7 @@ def main():
 	np.random.seed(42)
 	X_train, y_train, X_test, y_test = Util.load_mnist_data()
 
-	output_dir = 'output'
+	output_dir = 'output_default'
 	Util.reset_dir(output_dir)
 
 	gan = GAN()
