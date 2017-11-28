@@ -34,11 +34,11 @@ def log_proba(X_test, folder, file_name):
 
 		# Cross-validation to find best bandwidth
 		params = {'bandwidth': np.logspace(-1, 1, 20)}
-		grid = GridSearchCV(KernelDensity(kernel='gaussian'), params)
+		grid = GridSearchCV(KernelDensity(kernel='gaussian'), params, n_jobs=8)
 		grid.fit(samples)
 		print("best bandwidth: {0}".format(grid.best_estimator_.bandwidth))
 		kde = grid.best_estimator_
-		
+
 		scores = kde.score_samples(X_test)
 		return [np.mean(scores), np.std(scores)] # return mean log prob and std log prob
 
