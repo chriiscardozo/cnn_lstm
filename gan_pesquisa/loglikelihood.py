@@ -24,6 +24,18 @@ def save_results(folder, x, lls_avg, lls_std):
 	plt.savefig(os.path.join(folder, 'll.png'))
 	# plt.show()
 
+def calculate_log_proba(X_test, folder, file_name):
+	# TODO: cross-validation to bandwidth
+
+	with open(os.path.join(folder, file_name), 'r') as f:
+		reader = csv.reader(f, delimiter=',')
+		samples = []
+		for row in reader: samples.append(row)
+		samples = np.array(samples)
+		kde = KernelDensity(kernel='gaussian', bandwidth=0.2).fit(samples)
+		scores = kde.score_samples(X_test)
+		return [np.mean(scores), np.std(scores) # return mean log prob and std log prob
+
 def main():
 	if(len(sys.argv) < 2):
 		print("Error: missing input folder parameter")
@@ -41,27 +53,11 @@ def main():
 
 	for file_name in files:
 		print("Calculating for file", file_name)
-
 		x.append(int(file_name.split('.')[0].split('_')[1]))
-
-		f = open(os.path.join(folder, file_name), 'r')
-		reader = csv.reader(f, delimiter=',')
-		samples = []
-		for row in reader: samples.append(row)
-		samples = np.array(samples)
-
-		# TODO: cross-validation to bandwidth
-
-		kde = KernelDensity(kernel='gaussian', bandwidth=0.2).fit(samples)
-		scores = kde.score_samples(X_test)
-		avg = np.mean(scores)
-		std = np.std(scores)
+		avg, std = calculate_log_proba(X_test, folder, file_name)
 		lls_avg.append(avg)
 		lls_std.append(std)
-
 		print("avg:", avg, " | std:", std)
-
-		f.close()
 
 	save_results(folder, x, lls_avg, lls_std)
 
