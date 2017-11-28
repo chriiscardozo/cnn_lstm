@@ -66,6 +66,8 @@ def save_generated_images(e, generatedImages, output_dir, dim=(5, 5), figsize=(5
 		for x in generatedImages:
 			writer.writerow(x.tolist())
 
+	generatedImages = generatedImages.reshape(examples, 28, 28)
+
 	# saving as img
 	plt.close('all')
 	plt.figure(figsize=figsize)
