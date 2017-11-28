@@ -30,9 +30,8 @@ def load_mnist_data(one_hot=True):
 
 	return [X_train, y_train, X_test, y_test]
 
-def generate_graphics(times, d_lossses, g_losses, d_accuracies, output_dir):
+def generate_graphics(x, times, d_lossses, g_losses, d_accuracies, output_dir):
 	plt.close('all')
-	x = np.linspace(0, len(times), len(times))
 
 	plt.clf()
 	plt.title("GAN MNIST - Exec time per epoch")
@@ -81,6 +80,8 @@ def save_generated_images(e, generator, output_dir, dim=(5, 5), figsize=(5, 5), 
 		plt.axis('off')
 	plt.tight_layout()
 	plt.savefig(os.path.join(output_dir, str(e) + '.png'))
+
+	return 'samples_' + str(e) + '.csv'
 
 def reset_dir(folder):
 	if os.path.exists(folder):

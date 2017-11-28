@@ -8,7 +8,8 @@ from keras import backend as K
 import Util
 import numpy as np
 import time
-from Parzen import ParsenDensityEstimator as Parzen
+# from Parzen import ParsenDensityEstimator as Parzen
+from parzen_logprob import log_proba, save_results
 
 class GAN:
 	def __init__(self, optimizer=None, generator=None, discriminator=None):
@@ -44,7 +45,9 @@ class GAN:
 		d_losses = []
 		g_losses = []
 		d_accuracies = []
-		lls = [] # TODO: log-likelihood tracking
+		lls_mean = []
+		lls_std = []
+		x = []
 
 		start = time.time()
 
@@ -72,15 +75,22 @@ class GAN:
 			if(e % verbose_step == 0):
 				running_time = time.time() - start
 				start = time.time()
+				x.append(e)
 				d_losses.append(d_loss)
 				d_accuracies.append(d_accuracy)
 				g_losses.append(g_loss)
 				times.append(running_time)
 
-				print(str(e) + ": d_loss =", d_loss, "| g_loss =", g_loss, "| d_acc =", d_accuracy , "| time =", running_time)
-				Util.save_generated_images(e, self._generator, output_dir)
+				samples_file = Util.save_generated_images(e, self._generator, output_dir)
+				ll_mean, ll_std = log_proba(X_test, output_dir, samples_file)
 
-		Util.generate_graphics(times, d_losses, g_losses, d_accuracies, output_dir)
+				lls_mean.append(ll_mean)
+				lls_std.append(ll_std)
+
+				print(str(e) + ": d_loss =", d_loss, "| g_loss =", g_loss, "| d_acc =", d_accuracy, "| ll_mean =", ll_mean, "| ll_std =", ll_std, "| time =", running_time)
+				
+		Util.generate_graphics(x, times, d_losses, g_losses, d_accuracies, output_dir)
+		save_results(output_dir, x, lls_mean, lls_std)
 
 class Generator:
 	def __init__(self, optimizer, noise_dim=100, output_dim=784):

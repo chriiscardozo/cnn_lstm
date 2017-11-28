@@ -24,7 +24,7 @@ def save_results(folder, x, lls_avg, lls_std):
 	plt.savefig(os.path.join(folder, 'll.png'))
 	# plt.show()
 
-def calculate_log_proba(X_test, folder, file_name):
+def log_proba(X_test, folder, file_name):
 	# TODO: cross-validation to bandwidth
 
 	with open(os.path.join(folder, file_name), 'r') as f:
@@ -54,7 +54,7 @@ def main():
 	for file_name in files:
 		print("Calculating for file", file_name)
 		x.append(int(file_name.split('.')[0].split('_')[1]))
-		avg, std = calculate_log_proba(X_test, folder, file_name)
+		avg, std = log_proba(X_test, folder, file_name)
 		lls_avg.append(avg)
 		lls_std.append(std)
 		print("avg:", avg, " | std:", std)
