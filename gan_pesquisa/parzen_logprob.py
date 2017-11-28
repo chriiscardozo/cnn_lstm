@@ -18,10 +18,12 @@ def save_results(folder, x, lls_avg, lls_std):
 		writer.writerow(lls_std)
 
 	plt.clf()
-	plt.title("GAN MNIST - Log-Likelihood per epoch")
-	plt.ylabel('Log-Likelihood')
+	plt.title("GAN MNIST - Negative Log-Likelihood per epoch (log-scalar scale)")
+	plt.ylabel('Negative Log-Likelihood')
 	plt.xlabel('epoch')
-	plt.plot(x, lls_avg)
+	plt.yscale('log')
+	plt.text(max(x)/2,-min(lls_avg)/10,'min = ' + str(-int(max(lls_avg))) + '\nepoch = ' + str(x[np.array(lls_avg).argmax()]))
+	plt.plot(x, [-float(x) for x in lls_avg])
 	plt.savefig(os.path.join(folder, 'll.png'))
 	# plt.show()
 
