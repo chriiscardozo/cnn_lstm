@@ -2,6 +2,7 @@ from GAN import *
 import Util
 import numpy as np
 import time
+import sys
 
 def main():
 	start = time.time()
@@ -10,6 +11,8 @@ def main():
 	X_train, y_train, X_test, y_test = Util.load_mnist_data()
 
 	output_dir = 'output_default'
+	if len(sys.argv) == 2:
+		output_dir = sys.argv[1]
 	Util.reset_dir(output_dir)
 
 	gan = GAN()
