@@ -4,7 +4,7 @@ import Util
 from sklearn.neighbors.kde import KernelDensity
 import matplotlib.pyplot as plt
 from sklearn.model_selection import GridSearchCV
-from Parzen import Parzen
+from Parzen import ParsenDensityEstimator as Parzen
 
 def find_csv_filenames(path_to_dir, prefix="samples_", suffix=".csv"):
     filenames = os.listdir(path_to_dir)
