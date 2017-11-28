@@ -18,21 +18,15 @@ def K_parzen(x, mu, sigma):
 	z = K.to_float(K.shape(mu)[1]) * K.log(sigma * np.sqrt(np.pi * 2.0))
 	return e - z
 
+
 class ParsenDensityEstimator(object):
 	def __init__(self):
 		self.x = K.placeholder(K.float32)
 		self.mu = K.placeholder(K.float32)
 		self.sigma = K.placeholder(K.float32, [])
 		self.ll = K_parzen(self.x, self.mu, self.sigma)
+		self.sess = K.Session()
 
-	def logpdf(self, x, mu, sigma, sess):
+	def logpdf(self, x, mu, sigma, sess=None):
 		sess = sess or self.sess
 		return sess.run(self.ll, feed_dict={self.x: x, self.mu: mu, self.sigma: sigma})
-
-	def get_ll(self, x, mu, sigma, sess, batch_size=100):
-		lls = []
-		inds = range(x.shape[0])
-		n_batches = int(np.ceil(float(len(inds)) / batch_size))
-		for i in range(n_batches):
-			lls.extend(self.logpdf(x[inds[i::n_batches]], mu, sigma, sess))
-		return np.array(lls).mean()
