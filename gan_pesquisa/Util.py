@@ -56,7 +56,7 @@ def generate_graphics(times, d_lossses, g_losses, d_accuracies, output_dir):
 	plt.ylabel('accuracy')
 	plt.xlabel('epoch')
 	plt.plot(x, d_accuracies)
-	plt.savefig(os.path.join(output_dir, 'losses.png'))
+	plt.savefig(os.path.join(output_dir, 'accuracy.png'))
 	# plt.show()
 
 def save_generated_images(e, generator, output_dir, dim=(5, 5), figsize=(5, 5), examples_img=25, examples_csv=1000):
@@ -64,7 +64,7 @@ def save_generated_images(e, generator, output_dir, dim=(5, 5), figsize=(5, 5), 
 	generatedImages = generator.get_model().predict(noise)
 
 	# saving as csv
-	with open(os.path.join(output_dir, str(e) + '.csv'), 'w') as f:
+	with open(os.path.join(output_dir, 'samples_' + str(e) + '.csv'), 'w') as f:
 		writer = csv.writer(f, delimiter=',')
 		for x in generatedImages:
 			writer.writerow(x.tolist())
