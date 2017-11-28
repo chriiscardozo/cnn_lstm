@@ -14,11 +14,11 @@ from parzen_logprob import log_proba, save_results
 from Activations.BHAA import BHAA
 
 class GAN:
-	def __init__(self, optimizer=None, generator=None, discriminator=None):
+	def __init__(self, optimizer=None, generator=None, discriminator=None, session=None):
 		if(optimizer is None): optimizer = Adam(lr=0.0002, beta_1=0.5)
 		if(generator is None): generator = Generator(optimizer)
 		if(discriminator is None): discriminator = Discriminator(optimizer)
-
+		self._session = session
 		self._generator = generator
 		self._discriminator = discriminator
 		self._optimizer = optimizer
@@ -84,7 +84,7 @@ class GAN:
 				times.append(running_time)
 
 				samples_file = Util.save_generated_images(e, self._generator, output_dir)
-				ll_mean, ll_std = log_proba(X_test, output_dir, samples_file)
+				ll_mean, ll_std = log_proba(X_test, output_dir, samples_file, self._session)
 
 				lls_mean.append(ll_mean)
 				lls_std.append(ll_std)

@@ -3,6 +3,8 @@ import Util
 import numpy as np
 import time
 import sys
+import tensorflow as tf
+from keras import backend as K
 
 def main():
 	start = time.time()
@@ -15,7 +17,10 @@ def main():
 		output_dir = sys.argv[1]
 	Util.reset_dir(output_dir)
 
-	gan = GAN()
+	sess = tf.Session()
+	K.set_session(sess)
+
+	gan = GAN(session=sess)
 	gan.train(X_train, X_test, output_dir=output_dir)
 
 	Util.exec_time(start, "Running")

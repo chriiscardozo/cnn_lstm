@@ -28,7 +28,7 @@ def save_results(folder, x, lls_avg, lls_std):
 	plt.savefig(os.path.join(folder, 'll.png'))
 	# plt.show()
 
-def log_proba(X_test, folder, file_name):
+def log_proba(X_test, folder, file_name, session):
 	with open(os.path.join(folder, file_name), 'r') as f:
 		reader = csv.reader(f, delimiter=',')
 		samples = []
@@ -42,16 +42,16 @@ def log_proba(X_test, folder, file_name):
 		# print("best bandwidth: {0}".format(grid.best_estimator_.bandwidth))
 		# kde = grid.best_estimator_
 		# scores = kde.score_samples(X_test)
-		bands = np.logspace(-1, 1, 21)
+		bands = np.logspace(-1, 0, 10)
 		lls_val = []
 		for b in bands:
 			p = Parzen()
-			lls_val.append(p.logpdf(samples, samples, b).mean())
+			lls_val.append(p.logpdf(samples, samples, b, session).mean())
 
 		bandwidth = bands[np.array(lls_val).argmax()]
 		print("best bandwidth:", bandwidth)
 		p = Parzen()
-		scores = p.logpdf(X_test, samples, bandwidth)
+		scores = p.get_ll(X_test, samples, bandwidth, session)
 
 		return [np.mean(scores), np.std(scores)] # return mean log prob and std log prob
 
