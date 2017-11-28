@@ -11,6 +11,8 @@ import time
 # from Parzen import ParsenDensityEstimator as Parzen
 from parzen_logprob import log_proba, save_results
 
+from Activations.BHAA import BHAA
+
 class GAN:
 	def __init__(self, optimizer=None, generator=None, discriminator=None):
 		if(optimizer is None): optimizer = Adam(lr=0.0002, beta_1=0.5)
@@ -110,7 +112,8 @@ class Generator:
 			model.add(Dense(1024))
 			model.add(LeakyReLU(0.2))
 			model.add(Dense(self._output_dim))
-			model.add(Activation('tanh'))
+			#model.add(Activation('tanh'))
+			model.add(BHAA(dominio_0_1=False))
 
 			model.compile(loss='binary_crossentropy', optimizer=self._optimizer)
 
