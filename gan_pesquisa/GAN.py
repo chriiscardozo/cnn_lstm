@@ -4,7 +4,6 @@ from keras.initializers import RandomNormal
 from keras.layers import Input, Dense, LeakyReLU, Activation, Dropout
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
-from keras.callbacks import TensorBoard
 from keras import backend as K
 import Util
 import numpy as np
@@ -12,7 +11,7 @@ import time
 from Parzen import ParsenDensityEstimator as Parzen
 
 class GAN:
-	def __init__(self, sess, optimizer=None, generator=None, discriminator=None):
+	def __init__(self, optimizer=None, generator=None, discriminator=None):
 		if(optimizer is None): optimizer = Adam(lr=0.0002, beta_1=0.5)
 		if(generator is None): generator = Generator(optimizer)
 		if(discriminator is None): discriminator = Discriminator(optimizer)
@@ -22,15 +21,10 @@ class GAN:
 		self._optimizer = optimizer
 		self._model = self._create_gan_model()
 
-		self._tensorboard = TensorBoard(log_dir='./logs/default', histogram_freq=1, write_graph=True, write_images=True)
-		self._tensorboard.set_model(self._model)
-
-		self._session = sess
-
 	def _create_gan_model(self):
 		with K.name_scope('GAN'):
 			self._discriminator.set_trainable(False)
-			
+
 			D = self._discriminator.get_model()
 			G = self._generator.get_model()
 
@@ -38,12 +32,12 @@ class GAN:
 			gan_input = Input(shape=gan_input_shape)
 			gan_output = D(G(gan_input))
 			model = Model(gan_input, gan_output)
-			
+
 			model.compile(loss='binary_crossentropy', optimizer=self._optimizer)
 
 		return model
 
-	def train(self, X_train, X_test, epochs=50000, batch_size=128, verbose_step=250, output_dir='output'):
+	def train(self, X_train, X_test, epochs=25000, batch_size=128, verbose_step=250, output_dir='output'):
 		print("*** Training", epochs, "epochs with batch size =", batch_size, "***")
 
 		times = []
@@ -78,36 +72,20 @@ class GAN:
 			if(e % verbose_step == 0):
 				running_time = time.time() - start
 				start = time.time()
-				
 				d_losses.append(d_loss)
 				d_accuracies.append(d_accuracy)
 				g_losses.append(g_loss)
 				times.append(running_time)
-				ll_mean = self._compute_log_likelihood(X_test)
-				lls.append(ll_mean)
 
-				print(str(e) + ": d_loss =", d_loss, "| g_loss =", g_loss, "| time =", running_time, "| ll =", ll_mean)
-				self._plot_images(e, G_net, output_dir)
+				print(str(e) + ": d_loss =", d_loss, "| g_loss =", g_loss, "| d_acc =", d_accuracy , "| time =", running_time)
+				self._save_images(e, G_net, output_dir)
 
-				Util.write_tensorboard_log(self._tensorboard, 
-											['d_loss', 'g_loss', 'd_accuracy', 'mean_ll'], 
-											[d_loss, g_loss, d_accuracy, ll_mean], e)
-				
-		Util.generate_graphics(times, d_losses, g_losses, output_dir)
+		Util.generate_graphics(times, d_losses, g_losses, d_accuracies, output_dir)
 
-	def _compute_log_likelihood(self, X_test, batch_size=100):
-		noise = self._generator.generate_noise(10000)
-		generated_images = self._generator.get_model().predict(noise)
-		p = Parzen()
-		result = p.get_ll(X_test, generated_images, 0.5, self._session)
-		return result
-
-	def _plot_images(self, e, G_net, output_dir, examples=25):
+	def _save_images(self, e, G_net, output_dir, examples=25):
 		noise = self._generator.generate_noise(examples)
 		generatedImages = G_net.predict(noise)
-		generatedImages = generatedImages.reshape(examples, 28, 28)
-
-		Util.plot_generated_images(e, generatedImages, output_dir)
+		Util.save_generated_images(e, generatedImages, output_dir)
 
 class Generator:
 	def __init__(self, optimizer, noise_dim=100, output_dim=784):

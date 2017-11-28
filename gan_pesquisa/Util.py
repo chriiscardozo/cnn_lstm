@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os, shutil
 import time
 import tensorflow as tf
+import csv
 
 def convert_to_one_hot_vector(y, n_classes):
 	targets = np.array(y).reshape(-1)
@@ -15,7 +16,7 @@ def load_mnist_data(one_hot=True):
 	print("*** Loading MNIST dataset ***")
 
 	(X_train, y_train), (X_test, y_test) = mnist.load_data()
-	
+
 	X_train = (X_train.astype(np.float32)-127.5)/127.5
 	X_train = X_train.reshape(60000, 784)
 
@@ -29,7 +30,7 @@ def load_mnist_data(one_hot=True):
 
 	return [X_train, y_train, X_test, y_test]
 
-def generate_graphics(times, d_lossses, g_losses, output_dir):
+def generate_graphics(times, d_lossses, g_losses, d_accuracies, output_dir):
 	plt.close('all')
 	x = np.linspace(0, len(times), len(times))
 
@@ -50,9 +51,23 @@ def generate_graphics(times, d_lossses, g_losses, output_dir):
 	plt.savefig(os.path.join(output_dir, 'losses.png'))
 	# plt.show()
 
-def plot_generated_images(e, generatedImages, output_dir, dim=(5, 5), figsize=(5, 5)):
-	plt.close('all')
+	plt.clf()
+	plt.title("GAN MNIST - Disciminator accuracy per epoch")
+	plt.ylabel('accuracy')
+	plt.xlabel('epoch')
+	plt.plot(x, d_accuracies)
+	plt.savefig(os.path.join(output_dir, 'losses.png'))
+	# plt.show()
 
+def save_generated_images(e, generatedImages, output_dir, dim=(5, 5), figsize=(5, 5)):
+	# saving as csv
+	with open(os.path.join(output_dir, str(e) + '.txt'), 'w') as f:
+		writer = csv.writer(f, delimiter=',')
+		for x in generatedImages:
+			writer.writerow(x.tolist())
+
+	# saving as img
+	plt.close('all')
 	plt.figure(figsize=figsize)
 	for i in range(generatedImages.shape[0]):
 		plt.subplot(dim[0], dim[1], i+1)
@@ -71,12 +86,3 @@ def exec_time(start, msg):
 	delta = end - start
 	if(delta > 60): print("Tempo: " + str(delta/60.0) + " min [" + msg + "]")
 	else: print("Tempo: " + str(int(delta)) + " s [" + msg + "]")
-
-def write_tensorboard_log(callback, names, logs, batch_no):
-    for name, value in zip(names, logs):
-        summary = tf.Summary()
-        summary_value = summary.value.add()
-        summary_value.simple_value = value
-        summary_value.tag = name
-        callback.writer.add_summary(summary, batch_no)
-        callback.writer.flush()
