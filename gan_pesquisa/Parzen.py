@@ -29,10 +29,10 @@ class ParsenDensityEstimator(object):
 		sess = sess or self.sess
 		return sess.run(self.ll, feed_dict={self.x: x, self.mu: mu, self.sigma: sigma})
 
-	def get_ll(self, x, mu, sigma, sess, batch_size=1000):
+	def get_ll(self, x, mu, sigma, sess, batch_size=100):
 		lls = []
 		inds = range(x.shape[0])
 		n_batches = int(np.ceil(float(len(inds)) / batch_size))
 		for i in range(n_batches):
 			lls.extend(self.logpdf(x[inds[i::n_batches]], mu, sigma, sess))
-		return np.array(lls)
+		return np.array(lls).mean()

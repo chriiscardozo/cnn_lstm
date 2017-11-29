@@ -4,7 +4,6 @@ import Util
 from sklearn.neighbors.kde import KernelDensity
 import matplotlib.pyplot as plt
 from sklearn.model_selection import GridSearchCV
-from Parzen import ParsenDensityEstimator as Parzen
 
 def find_csv_filenames(path_to_dir, prefix="samples_", suffix=".csv"):
     filenames = os.listdir(path_to_dir)
@@ -28,7 +27,7 @@ def save_results(folder, x, lls_avg, lls_std):
 	plt.savefig(os.path.join(folder, 'll.png'))
 	# plt.show()
 
-def log_proba(X_test, folder, file_name, session):
+def log_proba(X_test, folder, file_name):
 	with open(os.path.join(folder, file_name), 'r') as f:
 		reader = csv.reader(f, delimiter=',')
 		samples = []
@@ -36,23 +35,13 @@ def log_proba(X_test, folder, file_name, session):
 		samples = np.array(samples)
 
 		# Cross-validation to find best bandwidth
-		# params = {'bandwidth': np.logspace(-1, 1, 20)}
-		# grid = GridSearchCV(KernelDensity(kernel='gaussian'), params, n_jobs=8)
-		# grid.fit(samples)
-		# print("best bandwidth: {0}".format(grid.best_estimator_.bandwidth))
-		# kde = grid.best_estimator_
-		# scores = kde.score_samples(X_test)
-		bands = np.logspace(-1, 0, 10)
-		lls_val = []
-		for b in bands:
-			p = Parzen()
-			lls_val.append(p.logpdf(samples, samples, b, session).mean())
+		params = {'bandwidth': np.linspace(0, 1, 11)}
+		grid = GridSearchCV(KernelDensity(kernel='gaussian'), params, n_jobs=8)
+		grid.fit(samples)
+		print("best bandwidth: {0}".format(grid.best_estimator_.bandwidth))
+		kde = grid.best_estimator_
 
-		bandwidth = bands[np.array(lls_val).argmax()]
-		print("best bandwidth:", bandwidth)
-		p = Parzen()
-		scores = p.get_ll(X_test, samples, bandwidth, session)
-
+		scores = kde.score_samples(X_test)
 		return [np.mean(scores), np.std(scores)] # return mean log prob and std log prob
 
 def main():

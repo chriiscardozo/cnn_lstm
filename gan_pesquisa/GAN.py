@@ -11,14 +11,14 @@ import time
 # from Parzen import ParsenDensityEstimator as Parzen
 from parzen_logprob import log_proba, save_results
 
-# from Activations.BHAA import BHAA
+from Activations.BHAA import BHAA
 
 class GAN:
-	def __init__(self, optimizer=None, generator=None, discriminator=None, session=None):
+	def __init__(self, optimizer=None, generator=None, discriminator=None):
 		if(optimizer is None): optimizer = Adam(lr=0.0002, beta_1=0.5)
 		if(generator is None): generator = Generator(optimizer)
 		if(discriminator is None): discriminator = Discriminator(optimizer)
-		self._session = session
+
 		self._generator = generator
 		self._discriminator = discriminator
 		self._optimizer = optimizer
@@ -76,7 +76,7 @@ class GAN:
 
 			if(e % verbose_step == 0):
 				samples_file = Util.save_generated_images(e, self._generator, output_dir)
-				ll_mean, ll_std = log_proba(X_test, output_dir, samples_file, self._session)
+				ll_mean, ll_std = log_proba(X_test, output_dir, samples_file)
 
 				lls_mean.append(ll_mean)
 				lls_std.append(ll_std)
@@ -111,8 +111,8 @@ class Generator:
 			model.add(Dense(1024))
 			model.add(LeakyReLU(0.2))
 			model.add(Dense(self._output_dim))
-			model.add(Activation('tanh'))
-			# model.add(BHAA(dominio_0_1=False))
+			#model.add(Activation('tanh'))
+			model.add(BHAA(dominio_0_1=False))
 
 			model.compile(loss='binary_crossentropy', optimizer=self._optimizer)
 
