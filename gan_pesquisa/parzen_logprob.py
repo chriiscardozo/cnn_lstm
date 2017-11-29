@@ -4,7 +4,7 @@ import Util
 from sklearn.neighbors.kde import KernelDensity
 import matplotlib.pyplot as plt
 from sklearn.model_selection import GridSearchCV
-from KernelDensity import KernelDensity as KDE
+from Parzen import ParsenDensityEstimator as Parzen
 
 def find_csv_filenames(path_to_dir, prefix="samples_", suffix=".csv"):
     filenames = os.listdir(path_to_dir)
@@ -35,21 +35,25 @@ def log_proba(X_test, folder, file_name, session):
 		for row in reader: samples.append(row)
 		samples = np.array(samples)
 
+		# Cross-validation to find best bandwidth
+		# params = {'bandwidth': np.logspace(-1, 1, 20)}
+		# grid = GridSearchCV(KernelDensity(kernel='gaussian'), params, n_jobs=8)
+		# grid.fit(samples)
+		# print("best bandwidth: {0}".format(grid.best_estimator_.bandwidth))
+		# kde = grid.best_estimator_
+		# scores = kde.score_samples(X_test)
 		bands = np.logspace(-1, 0, 10)
-		lls_bands = []
+		lls_val = []
 		for b in bands:
-			kde = KDE(samples, b)
-			lls = session.run(kde._log_prob(X_test))
+			p = Parzen()
+			lls_val.append(p.logpdf(samples, samples, b, session).mean())
 
-			lls_bands.append( lls )
-
-		tmp = np.array([x.mean() for x in lls_bands])
-		print(tmp)
-		argmax = tmp.argmax()
-		bandwidth = bands[argmax]
+		bandwidth = bands[np.array(lls_val).argmax()]
 		print("best bandwidth:", bandwidth)
+		p = Parzen()
+		scores = p.get_ll(X_test, samples, bandwidth, session)
 
-		return [np.mean(lls_bands[argmax]), np.std(lls_bands[argmax])] # return mean log prob and std log prob
+		return [np.mean(scores), np.std(scores)] # return mean log prob and std log prob
 
 def main():
 	if(len(sys.argv) < 2):
