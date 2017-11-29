@@ -111,8 +111,8 @@ class Generator:
 			model.add(Dense(1024))
 			model.add(LeakyReLU(0.2))
 			model.add(Dense(self._output_dim))
-			#model.add(Activation('tanh'))
-			model.add(BHAA(dominio_0_1=False))
+			model.add(Activation('tanh'))
+			#model.add(BHAA(dominio_0_1=False))
 
 			model.compile(loss='binary_crossentropy', optimizer=self._optimizer)
 
