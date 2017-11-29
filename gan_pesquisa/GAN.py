@@ -11,7 +11,7 @@ import time
 # from Parzen import ParsenDensityEstimator as Parzen
 from parzen_logprob import log_proba, save_results
 
-from Activations.BHAA import BHAA
+# from Activations.BHAA import BHAA
 
 class GAN:
 	def __init__(self, optimizer=None, generator=None, discriminator=None, session=None):
@@ -75,19 +75,18 @@ class GAN:
 			g_loss = GAN_net.train_on_batch(noise, y)
 
 			if(e % verbose_step == 0):
-				running_time = time.time() - start
-				start = time.time()
-				x.append(e)
-				d_losses.append(d_loss)
-				d_accuracies.append(d_accuracy)
-				g_losses.append(g_loss)
-				times.append(running_time)
-
 				samples_file = Util.save_generated_images(e, self._generator, output_dir)
 				ll_mean, ll_std = log_proba(X_test, output_dir, samples_file, self._session)
 
 				lls_mean.append(ll_mean)
 				lls_std.append(ll_std)
+				x.append(e)
+				d_losses.append(d_loss)
+				d_accuracies.append(d_accuracy)
+				g_losses.append(g_loss)
+				running_time = time.time() - start
+				start = time.time()
+				times.append(running_time)
 
 				print(str(e) + ": d_loss =", d_loss, "| g_loss =", g_loss, "| d_acc =", d_accuracy, "| ll_mean =", ll_mean, "| ll_std =", ll_std, "| time =", running_time)
 				
@@ -112,8 +111,8 @@ class Generator:
 			model.add(Dense(1024))
 			model.add(LeakyReLU(0.2))
 			model.add(Dense(self._output_dim))
-			#model.add(Activation('tanh'))
-			model.add(BHAA(dominio_0_1=False))
+			model.add(Activation('tanh'))
+			# model.add(BHAA(dominio_0_1=False))
 
 			model.compile(loss='binary_crossentropy', optimizer=self._optimizer)
 
