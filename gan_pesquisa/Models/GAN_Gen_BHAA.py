@@ -5,12 +5,10 @@ from keras.layers import Input, Dense, LeakyReLU, Activation, Dropout
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
 from keras import backend as K
-import Util
+from .. import Util
 import numpy as np
 import time
-# from Parzen import ParsenDensityEstimator as Parzen
 from parzen_logprob import log_proba, save_results
-
 from Activations.BHAA import BHAA
 
 class GAN:
@@ -111,8 +109,8 @@ class Generator:
 			model.add(Dense(1024))
 			model.add(LeakyReLU(0.2))
 			model.add(Dense(self._output_dim))
-			model.add(Activation('tanh'))
-			#model.add(BHAA(dominio_0_1=False))
+			# model.add(Activation('tanh'))
+			model.add(BHAA(dominio_0_1=False))
 
 			model.compile(loss='binary_crossentropy', optimizer=self._optimizer)
 
