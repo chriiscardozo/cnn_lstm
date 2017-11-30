@@ -5,7 +5,7 @@ from keras.layers import Input, Dense, LeakyReLU, Activation, Dropout
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
 from keras import backend as K
-from .. import Util
+import Util
 import numpy as np
 import time
 from parzen_logprob import log_proba, save_results
