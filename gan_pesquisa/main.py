@@ -2,8 +2,9 @@
 import Models.GAN_default as GAN_default
 import Models.GAN_Gen_BHAA as GAN_Gen_BHAA
 import Models.GAN_Gen_BHSA as GAN_Gen_BHSA
+import Models.GAN_Dis_BHAA as GAN_Dis_BHAA
 import Models.GAN_Dis_BHSA as GAN_Dis_BHSA
-import Models.GAN_Dis_BHSA as GAN_Dis_BHAA
+import Models.GAN_Dis_Gen_BHAA as GAN_Dis_Gen_BHAA
 import numpy as np
 import time
 import sys
@@ -19,7 +20,8 @@ def main():
 			   "gan_gen_bhaa": GAN_Gen_BHAA,
 			   "gan_gen_bhsa": GAN_Gen_BHSA,
 			   "gan_dis_bhsa": GAN_Dis_BHSA,
-			   "gan_dis_bhaa": GAN_Dis_BHAA }
+			   "gan_dis_bhaa": GAN_Dis_BHAA,
+			   "gan_dis_gen_bhaa": GAN_Dis_Gen_BHAA }
 
 	if len(sys.argv) < 2:
 		print("Error: missing models")
