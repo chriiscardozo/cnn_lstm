@@ -73,10 +73,10 @@ class GAN:
 
 			if(e % verbose_step == 0):
 				samples_file = Util.save_generated_images(e, self._generator, output_dir)
-				ll_mean, ll_std = log_proba(X_test, output_dir, samples_file)
+				# ll_mean, ll_std = log_proba(X_test, output_dir, samples_file)
 
-				lls_mean.append(ll_mean)
-				lls_std.append(ll_std)
+				# lls_mean.append(ll_mean)
+				# lls_std.append(ll_std)
 				x.append(e)
 				d_losses.append(d_loss)
 				d_accuracies.append(d_accuracy)
@@ -85,10 +85,16 @@ class GAN:
 				start = time.time()
 				times.append(running_time)
 
-				print(str(e) + ": d_loss =", d_loss, "| g_loss =", g_loss, "| d_acc =", d_accuracy, "| ll_mean =", ll_mean, "| ll_std =", ll_std, "| time =", running_time)
+				# print(str(e) + ": d_loss =", d_loss, "| g_loss =", g_loss, "| d_acc =", d_accuracy, "| ll_mean =", ll_mean, "| ll_std =", ll_std, "| time =", running_time)
+				# version without log-likelihood
+				print(str(e) + ": d_loss =", d_loss, "| g_loss =", g_loss, "| d_acc =", d_accuracy, "| time =", running_time)
 				
-		Util.generate_graphics(x, times, d_losses, g_losses, d_accuracies, output_dir)
-		save_results(output_dir, x, lls_mean, lls_std)
+		Util.save_general_information(  {"x": x, "times": times, "d_losses": d_losses,
+										"g_losses": g_losses, "d_accuracies": d_accuracies},
+										output_dir)
+
+		# Util.generate_graphics(x, times, d_losses, g_losses, d_accuracies, output_dir)
+		# save_results(output_dir, x, lls_mean, lls_std)
 
 class Generator:
 	def __init__(self, optimizer, noise_dim=100, output_dim=784):
