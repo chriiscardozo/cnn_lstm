@@ -6,6 +6,9 @@ import Models.GAN_Gen_BHSA as GAN_Gen_BHSA
 import Models.GAN_Dis_BHAA as GAN_Dis_BHAA
 import Models.GAN_Dis_BHSA as GAN_Dis_BHSA
 import Models.GAN_Dis_Gen_BHAA as GAN_Dis_Gen_BHAA
+import Models.GAN_Dis_Gen_BHSA as GAN_Dis_Gen_BHSA
+import Models.GAN_Dis_BHAA_Gen_BHSA as GAN_Dis_BHAA_Gen_BHSA
+import Models.GAN_Dis_BHSA_Gen_BHAA as GAN_Dis_BHSA_Gen_BHAA
 
 import numpy as np
 import random
@@ -23,22 +26,32 @@ def main():
 			   "gan_gen_bhsa": GAN_Gen_BHSA,
 			   "gan_dis_bhsa": GAN_Dis_BHSA,
 			   "gan_dis_bhaa": GAN_Dis_BHAA,
-			   "gan_dis_gen_bhaa": GAN_Dis_Gen_BHAA }
+			   "gan_dis_gen_bhaa": GAN_Dis_Gen_BHAA,
+			   "gan_dis_gen_bhsa": GAN_Dis_Gen_BHSA,
+			   "gan_dis_bhaa_gen_bhsa": GAN_Dis_BHAA_Gen_BHSA,
+			   "gan_dis_bhsa_gen_bhaa": GAN_Dis_BHSA_Gen_BHAA }
 
 	if len(sys.argv) < 2:
 		print("Error: missing models")
 
 	n_executions = 2
 
-	for model_name in sys.argv[1:]:
+	choosed_models = []
+	if(sys.argv[1] == 'all'): choosed_models = list(models.keys())
+	else: choosed_models = sys.argv[1:]
+
+	seeds = []
+	for i in range(n_executions):
+		seeds.append(datetime.now())
+
+	for model_name in choosed_models:
 		if model_name in models:
 			output_dir = 'output_' + model_name
 			Util.reset_dir(output_dir)
 
-			for i in range(n_executions):
+			for seed in seeds:
 				print("[", model_name, "]", i, "of", n_executions)
 
-				seed = datetime.now()
 				random.seed(seed)
 				np.random.seed(seed)
 
