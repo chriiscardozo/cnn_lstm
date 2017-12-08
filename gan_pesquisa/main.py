@@ -10,6 +10,7 @@ import Models.GAN_Dis_Gen_BHSA as GAN_Dis_Gen_BHSA
 import Models.GAN_Dis_BHAA_Gen_BHSA as GAN_Dis_BHAA_Gen_BHSA
 import Models.GAN_Dis_BHSA_Gen_BHAA as GAN_Dis_BHSA_Gen_BHAA
 
+import os
 import numpy as np
 import random
 import time
@@ -42,20 +43,22 @@ def main():
 
 	seeds = []
 	for i in range(n_executions):
-		seeds.append(datetime.now())
+		seeds.append(int(i * time.time()))
+
+	print("seeds:", seeds)
 
 	for model_name in choosed_models:
 		if model_name in models:
 			output_dir = 'output_' + model_name
 			Util.reset_dir(output_dir)
 
-			for seed in seeds:
+			for i, seed in enumerate(seeds):
 				print("[", model_name, "]", i, "of", n_executions)
 
 				random.seed(seed)
 				np.random.seed(seed)
 
-				execution_output_dir = os.path.join(output_dir, i)
+				execution_output_dir = os.path.join(output_dir, str(i))
 				Util.reset_dir(execution_output_dir)
 				
 				gan = models[model_name].GAN()

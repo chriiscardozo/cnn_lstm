@@ -97,7 +97,7 @@ def exec_time(start, msg):
 def save_general_information(values_dict, output_dir):
 	for k in values_dict:
 		value = values_dict[k]
-		with open(os.path.join(output_dir, k)) as f:
+		with open(os.path.join(output_dir, k + ".csv"), "w") as f:
 			writer = csv.writer(f, delimiter=',')
 			writer.writerow(value)
 
