@@ -35,7 +35,7 @@ def main():
 	if len(sys.argv) < 2:
 		print("Error: missing models")
 
-	n_executions = 2
+	n_executions = 10
 
 	choosed_models = []
 	if(sys.argv[1] == 'all'): choosed_models = list(models.keys())
@@ -43,7 +43,7 @@ def main():
 
 	seeds = []
 	for i in range(n_executions):
-		seeds.append(int(i * time.time()))
+		seeds.append(int(str(time.time()).split('.')[1]))
 
 	print("seeds:", seeds)
 
