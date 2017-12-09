@@ -101,3 +101,6 @@ def save_general_information(values_dict, output_dir):
 			writer = csv.writer(f, delimiter=',')
 			writer.writerow(value)
 
+def find_output_folders(folder='.', prefix='output_gan_',sorted_fnt=lambda x: x):
+	filenames = os.listdir(folder)
+	return sorted([ filename for filename in filenames if filename.startswith( prefix ) ], key=sorted_fnt)
