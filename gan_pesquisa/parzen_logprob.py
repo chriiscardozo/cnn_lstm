@@ -4,28 +4,7 @@ import Util
 from sklearn.neighbors.kde import KernelDensity
 import matplotlib.pyplot as plt
 from sklearn.model_selection import GridSearchCV
-
-def find_csv_filenames(path_to_dir, prefix="samples_", suffix=".csv"):
-    filenames = os.listdir(path_to_dir)
-    return [ filename for filename in filenames if filename.startswith( prefix ) and filename.endswith( suffix ) ]
-
-def save_results(folder, x, lls_avg, lls_std):
-	with open(os.path.join(folder, 'lls_avg.csv'), 'w') as f:
-		writer = csv.writer(f, delimiter=',')
-		writer.writerow(lls_avg)
-	with open(os.path.join(folder, 'lls_std.csv'), 'w') as f:
-		writer = csv.writer(f, delimiter=',')
-		writer.writerow(lls_std)
-
-	plt.clf()
-	plt.title("GAN MNIST - Negative Log-Likelihood per epoch (log-scalar scale)")
-	plt.ylabel('Negative Log-Likelihood')
-	plt.xlabel('epoch')
-	plt.yscale('log')
-	plt.text(max(x)/2,-min(lls_avg)/10,'min = ' + str(-int(max(lls_avg))) + '\nepoch = ' + str(x[np.array(lls_avg).argmax()]))
-	plt.plot(x, [-float(x) for x in lls_avg])
-	plt.savefig(os.path.join(folder, 'll.png'))
-	# plt.show()
+from Util import find_csv_filenames
 
 def log_proba(X_test, folder, file_name):
 	with open(os.path.join(folder, file_name), 'r') as f:

@@ -104,3 +104,27 @@ def save_general_information(values_dict, output_dir):
 def find_output_folders(folder='.', prefix='output_gan_',sorted_fnt=lambda x: x):
 	filenames = os.listdir(folder)
 	return sorted([ filename for filename in filenames if filename.startswith( prefix ) ], key=sorted_fnt)
+
+
+def save_ll_results(folder, x, lls_avg, lls_std):
+	with open(os.path.join(folder, 'lls_avg.csv'), 'w') as f:
+		writer = csv.writer(f, delimiter=',')
+		writer.writerow(lls_avg)
+	with open(os.path.join(folder, 'lls_std.csv'), 'w') as f:
+		writer = csv.writer(f, delimiter=',')
+		writer.writerow(lls_std)
+
+	plt.clf()
+	plt.title("GAN MNIST - Negative Log-Likelihood per epoch (log-scalar scale)")
+	plt.ylabel('Negative Log-Likelihood')
+	plt.xlabel('epoch')
+	plt.yscale('log')
+	plt.text(max(x)/2,-min(lls_avg)/10,'min = ' + str(-int(max(lls_avg))) + '\nepoch = ' + str(x[np.array(lls_avg).argmax()]))
+	plt.plot(x, [-float(x) for x in lls_avg])
+	plt.savefig(os.path.join(folder, 'll.png'))
+	# plt.show()
+
+
+def find_csv_filenames(path_to_dir, prefix="samples_", suffix=".csv",sorted_fnt=lambda x: x):
+	filenames = os.listdir(path_to_dir)
+	return sorted([ filename for filename in filenames if filename.startswith( prefix ) and filename.endswith( suffix ) ], key=sorted_fnt)

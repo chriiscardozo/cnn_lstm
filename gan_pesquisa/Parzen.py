@@ -35,4 +35,4 @@ class ParsenDensityEstimator(object):
 		n_batches = int(np.ceil(float(len(inds)) / batch_size))
 		for i in range(n_batches):
 			lls.extend(self.logpdf(x[inds[i::n_batches]], mu, sigma, sess))
-		return np.array(lls).mean()
+		return [np.array(lls).mean(), np.array(lls).std()]
