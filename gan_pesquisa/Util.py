@@ -1,6 +1,7 @@
 import numpy as np
 from keras.datasets import mnist
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 import os, shutil
 import time
 import tensorflow as tf
